@@ -5,6 +5,7 @@ Bagian dari APK RADAR. Mendeteksi setup intraday emas (OKX `XAU-USDT-SWAP`) dan 
 - **Dashboard live:** `index.html` (GitHub Pages). Harga dan candle diambil langsung dari OKX di browser.
 - **Alert Telegram:** `scripts/radar_xau.py`, dijalankan GitHub Actions tiap 15 menit saat sesi London/NY dan tiap jam di luar sesi. Mengirim pesan saat setup v1 valid dan saat sinyal kena TP/SL/24 jam.
 - **State:** `data/signals.json` (riwayat sinyal = jurnal forward test otomatis), `data/macro.json` (skor makro harian).
+- **Evaluasi mingguan:** `scripts/evaluasi_mingguan.py` (workflow *Evaluasi mingguan*, Minggu 08:17 WIB). Backtest ulang aturan v1 di seluruh data OKX terbaru, periode 6/3 bulan & sejak live, cek apakah filter D1/makro masih membantu, sensitivitas SL/TP (hanya dipantau), dan cocokkan sinyal live dengan backtest. Hasil di `data/backtest.json`, dashboard, dan Telegram.
 - **Backtest:** `backtest/` (hasil backtest #1, 19 Okt 2026).
 
 ## Aturan setup v1 (breakout range Asia)
