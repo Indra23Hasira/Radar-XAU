@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Radar XAU/USDT</title>
+<meta name="theme-color" content="#12161a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /* APK RADAR — layout satu kolom, dibaca di HP sambil buka MetaTrader */
+  :root {
+    --bg: #eef0ec; --surface: #ffffff; --surface-2: #e4e7e1; --border: #cfd4cb;
+    --ink: #1c201b; --ink-muted: #5c6459; --accent: #a8752f; --accent-ink: #6e4c1e; --gold-bg: #f4ead8;
+    --buy: #2f7a4d; --buy-bg: #e3f0e6; --sell: #b23b3b; --sell-bg: #f6e4e2; --watch: #4d5c86; --watch-bg: #e6e9f2;
+    --shadow: 0 1px 2px rgba(28,32,27,0.06), 0 6px 20px rgba(28,32,27,0.05);
+    --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12161a; --surface: #181d22; --surface-2: #1f2630; --border: #2d3640;
+      --ink: #e8ece8; --ink-muted: #9ba69f; --accent: #d6a756; --accent-ink: #f0cb8a; --gold-bg: #2a2418;
+      --buy: #55b482; --buy-bg: #17281f; --sell: #e0716b; --sell-bg: #2c1a1a; --watch: #8c9bc4; --watch-bg: #1c2130;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-sans); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  a { color: var(--accent-ink); }
+  .wrap { max-width: 760px; margin: 0 auto; padding-block: max(20px, env(safe-area-inset-top, 0px)) 64px; padding-left: max(14px, env(safe-area-inset-left, 0px)); padding-right: max(14px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 16px; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .eyebrow { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent-ink); }
+  h1 { font-size: 26px; margin: 2px 0 0; letter-spacing: -0.01em; }
+  .price { font-family: var(--font-mono); font-size: 30px; font-weight: 600; text-align: right; line-height: 1.1; }
+  .price-sub { font-size: 12.5px; color: var(--ink-muted); text-align: right; }
+  .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-muted); margin-right: 5px; vertical-align: middle; }
+  .dot.ok { background: var(--buy); } .dot.err { background: var(--sell); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-muted); font-weight: 600; margin: 0; }
+  p { margin: 0; }
+  .muted { color: var(--ink-muted); } .small { font-size: 13px; }
+  .pill { align-self: flex-start; display: inline-flex; font-weight: 700; font-size: 15px; padding: 6px 13px; border-radius: 999px; border: 1.5px solid currentColor; }
+  .pill.wait { color: var(--watch); background: var(--watch-bg); }
+  .pill.buy { color: var(--buy); background: var(--buy-bg); }
+  .pill.sell { color: var(--sell); background: var(--sell-bg); }
+  .pill.gold { color: var(--accent-ink); background: var(--gold-bg); }
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  @media (max-width: 480px) { .tiles { grid-template-columns: 1fr; } }
+  .tile { border-radius: 8px; padding: 10px 12px; background: var(--surface-2); border-top: 3px solid var(--stripe, var(--border)); min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .tile .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); font-weight: 600; }
+  .tile .v { font-size: 17px; font-weight: 700; color: var(--stripe, var(--ink)); }
+  .tile .w { font-size: 12.5px; color: var(--ink-muted); }
+  .up { --stripe: var(--buy); } .down { --stripe: var(--sell); } .flat { --stripe: var(--watch); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  td, th { padding: 8px 6px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); font-weight: 600; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  td.r, th.r { text-align: right; }
+  .pos { color: var(--buy); } .neg { color: var(--sell); }
+  .scroll { overflow-x: auto; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+  .out { background: var(--surface-2); border-radius: 8px; padding: 9px 11px; min-width: 0; }
+  .out .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-muted); font-weight: 600; }
+  .out .v { font-family: var(--font-mono); font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+  .sig { border-radius: 8px; padding: 12px 14px; border: 1.5px solid var(--stripe); background: var(--surface-2); display: flex; flex-direction: column; gap: 8px; }
+  label.f { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--ink-muted); font-weight: 500; }
+  input { font: inherit; font-family: var(--font-mono); font-size: 15px; color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 9px; width: 100%; min-width: 0; }
+  input:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  details summary { cursor: pointer; font-weight: 600; }
+  ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+  .note { padding: 10px 12px; border-radius: 8px; background: var(--surface-2); font-size: 13px; }
+  .note.warn { background: var(--gold-bg); }
+  button.ref { font: inherit; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); cursor: pointer; }
+  footer { font-size: 12.5px; color: var(--ink-muted); display: flex; flex-direction: column; gap: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">APK RADAR · Radar Komoditas</div>
+      <h1>Radar XAU/USDT</h1>
+    </div>
+    <div>
+      <div class="price" id="px">–</div>
+      <div class="price-sub"><span class="dot" id="conn"></span><span id="pxTime">memuat data OKX…</span></div>
+    </div>
+  </header>
+
+  <section class="card" aria-live="polite">
+    <h2>Status sekarang</h2>
+    <span class="pill wait" id="verdict">Memuat…</span>
+    <p id="reason" class="small"></p>
+    <div class="tiles">
+      <div class="tile flat" id="tH4"><span class="k">Tren H4</span><span class="v">–</span><span class="w"></span></div>
+      <div class="tile flat" id="tD1"><span class="k">Tren D1</span><span class="v">–</span><span class="w"></span></div>
+      <div class="tile flat" id="tMac"><span class="k">Makro (veto)</span><span class="v">–</span><span class="w"></span></div>
+    </div>
+    <div class="scroll">
+      <table><tbody id="levels"></tbody></table>
+    </div>
+  </section>
+
+  <section class="card" id="sigCard" hidden>
+    <h2>Sinyal aktif</h2>
+    <div id="sigBody"></div>
+  </section>
+
+  <section class="card">
+    <h2>Ukuran posisi</h2>
+    <div class="grid2">
+      <label class="f" for="eq">Modal (USDT)<input id="eq" type="number" inputmode="decimal" value="1000"></label>
+      <label class="f" for="rk">Risiko per trade (%)<input id="rk" type="number" inputmode="decimal" step="0.1" value="1"></label>
+    </div>
+    <div class="grid2" id="sizeOut"></div>
+    <p class="small muted">Dihitung dari jarak SL (2 × ATR14 H1 terakhir). Fee taker OKX 0,05% per sisi.</p>
+  </section>
+
+  <section class="card">
+    <h2>Forward test (dari alert Telegram)</h2>
+    <div class="grid2">
+      <div class="out"><div class="k">Sinyal selesai</div><div class="v" id="fN">0</div></div>
+      <div class="out"><div class="k">Win rate</div><div class="v" id="fW">–</div></div>
+      <div class="out"><div class="k">Rata-rata (net)</div><div class="v" id="fA">–</div></div>
+      <div class="out"><div class="k">Total (net)</div><div class="v" id="fT">–</div></div>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Sinyal</th><th>Arah</th><th class="r">Entry</th><th class="r">Hasil</th></tr></thead>
+        <tbody id="hist"><tr><td colspan="4" class="muted small">Belum ada sinyal sejak radar aktif.</td></tr></tbody>
+      </table>
+    </div>
+    <p class="small muted">Backtest Apr 2025–Okt 2026: win 55%, +0,26R per sinyal setelah fee. Out-of-sample Mei 2024–Apr 2025: −0,08R. Lanjut ke uang sungguhan hanya kalau hasil forward mendekati backtest.</p>
+  </section>
+
+  <section class="card">
+    <details>
+      <summary>Aturan setup v1</summary>
+      <ol style="margin-top:10px;">
+        <li><b>Tren H4</b>: long jika close &gt; EMA50 &gt; EMA200, short kebalikannya.</li>
+        <li><b>Tren D1</b>: EMA20 harian &gt; EMA50 untuk long, &lt; untuk short.</li>
+        <li><b>Veto makro</b>: skor DXY 5 hari + yield riil 10Y 5 hari. Long butuh ≥0, short ≤0.</li>
+        <li><b>Pemicu</b>: candle H1 yang mulai 14:00–22:00 WIB tutup pertama kali di luar range Asia (07:00–13:59 WIB).</li>
+        <li><b>Eksekusi</b>: entry di open H1 berikutnya, SL 2×ATR14 H1, TP 2R, tutup setelah 24 jam. Satu posisi pada satu waktu.</li>
+        <li>Tidak ada entry baru Jumat mulai 23:00 WIB dan akhir pekan.</li>
+      </ol>
+    </details>
+  </section>
+
+  <footer>
+    <p id="botStatus">Status radar Telegram: memuat…</p>
+    <p>Harga & candle: OKX XAU-USDT-SWAP (langsung dari browser). Makro: Yahoo Finance (DXY) & FRED DFII10, diperbarui GitHub Actions. Level memakai harga OKX; di MetaTrader pakai jaraknya.</p>
+    <p>Alat bantu analisis, bukan saran keuangan. <button class="ref" id="refresh" type="button">Muat ulang data</button></p>
+  </footer>
+</div>
+
+<script id="core">
+/* ===== logika inti — identik dengan scripts/radar_xau.py ===== */
+var XAU = (function () {
+  var H = 3600e3, D = 86400e3;
+  function ema(arr, n) { var a = 2 / (n + 1), out = new Array(arr.length); for (var i = 0; i < arr.length; i++) out[i] = i ? out[i-1] + a * (arr[i] - out[i-1]) : arr[i]; return out; }
+  function atr(b, n) {
+    var a = 1 / n, out = new Array(b.length);
+    for (var i = 0; i < b.length; i++) {
+      var tr = b[i].h - b[i].l;
+      if (i) tr = Math.max(tr, Math.abs(b[i].h - b[i-1].c), Math.abs(b[i].l - b[i-1].c));
+      out[i] = i ? out[i-1] + a * (tr - out[i-1]) : tr;
+    }
+    return out;
+  }
+  function prep(h1, h4, d1) {
+    var c4 = h4.map(function (b) { return b.c; }), e50 = ema(c4, 50), e200 = ema(c4, 200);
+    h4.forEach(function (b, i) { b.ema50 = e50[i]; b.ema200 = e200[i];
+      b.trend = (b.c > b.ema50 && b.ema50 > b.ema200) ? 1 : (b.c < b.ema50 && b.ema50 < b.ema200) ? -1 : 0; });
+    var cd = d1.map(function (b) { return b.c; }), e20 = ema(cd, 20), d50 = ema(cd, 50);
+    d1.forEach(function (b, i) { b.ema20 = e20[i]; b.ema50 = d50[i]; b.dtrend = b.ema20 > b.ema50 ? 1 : -1; });
+    var at = atr(h1, 14); h1.forEach(function (b, i) { b.atr = at[i]; });
+  }
+  function lastBefore(arr, dur, t) { var r = null; for (var i = 0; i < arr.length; i++) { if (arr[i].t + dur <= t) r = arr[i]; else break; } return r; }
+  function isoDate(ms) { return new Date(ms).toISOString().slice(0, 10); }
+  function macroFor(rows, t) { var lim = isoDate(Math.floor(t / D) * D - 2 * D), r = null; (rows || []).forEach(function (x) { if (x.date <= lim) r = x; }); return r; }
+  function asia(h1, dayStart) { var bs = h1.filter(function (b) { return b.t >= dayStart && b.t < dayStart + 7 * H; }); if (bs.length !== 7) return null;
+    return { h: Math.max.apply(null, bs.map(function (b) { return b.h; })), l: Math.min.apply(null, bs.map(function (b) { return b.l; })) }; }
+  /* status untuk candle H1 yang dibuka pada waktu t (ms); dipakai juga untuk "candle berikutnya" */
+  function context(t, h1, h4, d1, mrows) {
+    var b4 = lastBefore(h4, 4 * H, t), bd = lastBefore(d1, D, t), mr = macroFor(mrows, t), ar = asia(h1, Math.floor(t / D) * D);
+    var hb = null; for (var i = h1.length - 1; i >= 0; i--) { if (h1[i].t < t) { hb = h1[i]; break; } }
+    return { trend: b4 ? b4.trend : 0, h4: b4, dtrend: bd ? bd.dtrend : 0, d1: bd, macro: mr ? mr.macro : 0, macroRow: mr, asia: ar, atr: hb ? hb.atr : null };
+  }
+  function evaluate(t, h1, h4, d1, mrows) {
+    var idx = -1; for (var i = 0; i < h1.length; i++) if (h1[i].t === t) idx = i;
+    var c = context(t, h1, h4, d1, mrows); var bar = h1[idx], prev = h1[idx - 1]; c.atr = bar.atr; c.dir = 0;
+    var dt = new Date(t), hr = dt.getUTCHours(), dow = (dt.getUTCDay() + 6) % 7;
+    if (dow >= 5 || (dow === 4 && hr >= 16) || hr < 7 || hr > 15 || !c.asia) return c;
+    var d = 0;
+    if (c.trend === 1 && bar.c > c.asia.h && prev.c <= c.asia.h) d = 1;
+    else if (c.trend === -1 && bar.c < c.asia.l && prev.c >= c.asia.l) d = -1;
+    if (!d) return c;
+    c.rawDir = d;
+    if (c.dtrend !== d) { c.blocked = 'tren D1 berlawanan'; return c; }
+    if (Math.sign(c.macro) * d < 0) { c.blocked = 'veto makro'; return c; }
+    c.dir = d; return c;
+  }
+  return { ema: ema, atr: atr, prep: prep, context: context, evaluate: evaluate, macroFor: macroFor, H: H, D: D };
+})();
+if (typeof module !== 'undefined') module.exports = XAU;
+</script>
+
+<script>
+(function () {
+  var INST = 'XAU-USDT-SWAP', API = 'https://www.okx.com/api/v5/market/';
+  var H = XAU.H, D = XAU.D, FEE = 0.0005;
+  var S = { h1: null, h4: null, d1: null, macro: null, sigs: null, px: null, pxT: null, loadedAt: 0 };
+  var BULAN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], HARI = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  function $(id) { return document.getElementById(id); }
+  function f1(x) { return x == null || isNaN(x) ? '–' : x.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
+  function wib(ms, day) { var d = new Date(ms + 7 * H); var s = d.getUTCDate() + ' ' + BULAN[d.getUTCMonth()] + ' ' + String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0');
+    return (day ? HARI[d.getUTCDay()] + ' ' : '') + s; }
+  function hm(ms) { var d = new Date(ms + 7 * H); return String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0'); }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function getJSON(u) { return fetch(u, { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); }
+
+  async function candles(bar, n) {
+    var rows = {}, after = '', guard = 0;
+    while (Object.keys(rows).length < n + 2 && guard++ < 20) {
+      var j = await getJSON(API + 'history-candles?instId=' + INST + '&bar=' + bar + '&limit=100' + (after ? '&after=' + after : ''));
+      if (j.code !== '0' || !j.data.length) break;
+      j.data.forEach(function (r) { rows[r[0]] = r; }); after = j.data[j.data.length - 1][0];
+      await sleep(120);
+    }
+    var all = Object.values(rows).sort(function (a, b) { return +a[0] - +b[0]; });
+    var live = all.filter(function (r) { return r[8] !== '1'; }).map(conv);
+    var done = all.filter(function (r) { return r[8] === '1'; }).map(conv);
+    return { done: done.slice(-n), live: live[live.length - 1] || null };
+  }
+  function conv(r) { return { t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4] }; }
+
+  async function loadCandles() {
+    var a = await candles('1H', 200), b = await candles('4H', 1200), c = await candles('1Dutc', 300);
+    S.h1 = a.done; S.h1live = a.live; S.h4 = b.done; S.d1 = c.done;
+    XAU.prep(S.h1, S.h4, S.d1); S.loadedAt = Date.now();
+  }
+  async function loadRepo() {
+    try { S.macro = await getJSON('data/macro.json?ts=' + Date.now()); } catch (e) { S.macro = null; }
+    try { S.sigs = await getJSON('data/signals.json?ts=' + Date.now()); } catch (e) { S.sigs = null; }
+  }
+  async function loadPrice() {
+    try {
+      var j = await getJSON(API + 'ticker?instId=' + INST);
+      S.px = +j.data[0].last; S.pxT = +j.data[0].ts; S.open24 = +j.data[0].sodUtc0;
+      $('conn').className = 'dot ok';
+    } catch (e) { $('conn').className = 'dot err'; }
+  }
+
+  function tile(id, cls, v, w) { var el = $(id); el.className = 'tile ' + cls; el.querySelector('.v').textContent = v; el.querySelector('.w').textContent = w; }
+  function row(k, v, cls) { return '<tr><td>' + k + '</td><td class="r num ' + (cls || '') + '">' + v + '</td></tr>'; }
+
+  function render() {
+    if (S.px != null) {
+      $('px').textContent = f1(S.px);
+      var ch = S.open24 ? (S.px / S.open24 - 1) * 100 : null;
+      $('pxTime').textContent = (ch != null ? (ch >= 0 ? '+' : '') + ch.toFixed(2) + '% hari ini · ' : '') + wib(S.pxT) + ' WIB';
+    }
+    if (!S.h1 || !S.h1.length) return;
+    var now = Date.now(), nextBar = Math.floor(now / H) * H; // candle H1 yang sedang berjalan
+    var rows = S.macro ? S.macro.rows : [];
+    var c = XAU.context(nextBar, S.h1, S.h4, S.d1, rows);
+    var tr = { 1: 'NAIK', '-1': 'TURUN', 0: 'NETRAL' };
+    var b4 = c.h4;
+    tile('tH4', c.trend === 1 ? 'up' : c.trend === -1 ? 'down' : 'flat', tr[c.trend],
+      b4 ? 'Close ' + f1(b4.c) + ' · EMA50 ' + f1(b4.ema50) + ' · EMA200 ' + f1(b4.ema200) : '');
+    tile('tD1', c.dtrend === 1 ? 'up' : 'down', tr[c.dtrend], c.d1 ? 'EMA20 ' + f1(c.d1.ema20) + ' · EMA50 ' + f1(c.d1.ema50) : '');
+    var mr = c.macroRow;
+    tile('tMac', c.macro > 0 ? 'up' : c.macro < 0 ? 'down' : 'flat', (c.macro > 0 ? '+' : '') + c.macro,
+      mr ? 'DXY ' + (mr.dxy_ch5 >= 0 ? '+' : '') + mr.dxy_ch5.toFixed(2) + '% · yield riil ' + (mr.ry_ch5 >= 0 ? '+' : '') + mr.ry_ch5.toFixed(2) + ' (5h, data ' + mr.date + ')' + (S.macro.stale ? ' · data lama' : '') : 'data makro belum tersedia');
+
+    var longOK = c.trend === 1 && c.dtrend === 1 && c.macro >= 0, shortOK = c.trend === -1 && c.dtrend === -1 && c.macro <= 0;
+    var dt = new Date(nextBar), hr = dt.getUTCHours(), dow = (dt.getUTCDay() + 6) % 7;
+    var v = $('verdict'), reason = '';
+    var open = S.sigs && S.sigs.signals ? S.sigs.signals.filter(function (s) { return s.status === 'OPEN'; })[0] : null;
+    var lv = '';
+    if (c.asia) {
+      lv += row('Range Asia (07:00–13:59 WIB)', f1(c.asia.l) + ' – ' + f1(c.asia.h));
+      lv += row('Pemicu long: H1 tutup di atas', f1(c.asia.h) + (S.px ? ' (' + (S.px - c.asia.h >= 0 ? '+' : '') + f1(S.px - c.asia.h) + ')' : ''), longOK ? 'pos' : '');
+      lv += row('Pemicu short: H1 tutup di bawah', f1(c.asia.l) + (S.px ? ' (' + (S.px - c.asia.l >= 0 ? '+' : '') + f1(S.px - c.asia.l) + ')' : ''), shortOK ? 'neg' : '');
+    }
+    lv += row('ATR14 H1', c.atr ? c.atr.toFixed(2) : '–');
+    lv += row('Jarak SL / TP', c.atr ? f1(2 * c.atr) + ' / ' + f1(4 * c.atr) : '–');
+    $('levels').innerHTML = lv;
+
+    if (open) { v.className = 'pill ' + (open.dir === 1 ? 'buy' : 'sell'); v.textContent = 'Sinyal ' + (open.dir === 1 ? 'LONG' : 'SHORT') + ' sedang berjalan'; reason = 'Satu posisi pada satu waktu: tidak ada sinyal baru sampai sinyal ini selesai.'; }
+    else if (dow >= 5 || (dow === 4 && hr >= 16)) { v.className = 'pill wait'; v.textContent = 'Akhir pekan — tidak ada entry baru'; reason = 'Perpetual tetap jalan, tapi pasar emas spot tutup. Radar aktif lagi Senin 14:00 WIB.'; }
+    else if (!longOK && !shortOK) {
+      v.className = 'pill wait'; v.textContent = 'Tidak ada arah yang diizinkan';
+      var why = [];
+      if (c.trend === 0) why.push('tren H4 belum sejajar');
+      else { var d = c.trend; if (c.dtrend !== d) why.push((d === 1 ? 'long' : 'short') + ' melawan tren D1'); if (Math.sign(c.macro) * d < 0) why.push((d === 1 ? 'long' : 'short') + ' diveto makro'); }
+      reason = 'Sebab: ' + why.join(', ') + '. Tunggu sampai H4, D1, dan makro searah.';
+    } else {
+      var arah = longOK ? 'LONG' : 'SHORT';
+      if (hr < 7) { v.className = 'pill gold'; v.textContent = 'Arah diizinkan: ' + arah + ' — range Asia terbentuk'; reason = 'Range Asia selesai pukul 14:00 WIB. Setelah itu tunggu candle H1 tutup di ' + (longOK ? 'atas high' : 'bawah low') + ' range.'; }
+      else if (hr <= 15) { v.className = 'pill ' + (longOK ? 'buy' : 'sell'); v.textContent = 'Menunggu breakout ' + arah;
+        reason = 'Valid kalau candle H1 tutup di ' + (longOK ? 'atas ' + f1(c.asia && c.asia.h) : 'bawah ' + f1(c.asia && c.asia.l)) + ' sebelum 23:00 WIB, dan breakout pertama hari ini. Alert Telegram dikirim otomatis.'; }
+      else { v.className = 'pill wait'; v.textContent = 'Jendela breakout hari ini selesai'; reason = 'Jendela 14:00–22:59 WIB sudah lewat. Cek lagi besok.'; }
+    }
+    $('reason').textContent = reason;
+
+    // sinyal aktif
+    if (open) {
+      $('sigCard').hidden = false;
+      var rNow = S.px ? open.dir * (S.px - open.entry) / open.risk : null;
+      $('sigBody').innerHTML = '<div class="sig" style="--stripe:' + (open.dir === 1 ? 'var(--buy)' : 'var(--sell)') + ';">' +
+        '<b>' + (open.dir === 1 ? 'LONG' : 'SHORT') + ' · entry ' + f1(open.entry) + ' (' + wib(Date.parse(open.entry_t), true) + ' WIB)</b>' +
+        '<div class="grid2"><div class="out"><div class="k">Stop loss</div><div class="v">' + f1(open.sl) + '</div></div>' +
+        '<div class="out"><div class="k">Take profit</div><div class="v">' + f1(open.tp) + '</div></div>' +
+        '<div class="out"><div class="k">Posisi sekarang</div><div class="v ' + (rNow >= 0 ? 'pos' : 'neg') + '">' + (rNow == null ? '–' : (rNow >= 0 ? '+' : '') + rNow.toFixed(2) + 'R') + '</div></div>' +
+        '<div class="out"><div class="k">Batas waktu</div><div class="v">' + wib(Date.parse(open.deadline), true) + '</div></div></div></div>';
+    } else $('sigCard').hidden = true;
+
+    // ukuran posisi
+    var eq = parseFloat($('eq').value), rk = parseFloat($('rk').value), dist = open ? open.risk : (c.atr ? 2 * c.atr : null), ent = open ? open.entry : S.px;
+    var out = '';
+    if (eq > 0 && rk > 0 && dist && ent) {
+      var risk = eq * rk / 100, ct = Math.floor(risk / dist / 0.001), size = ct * 0.001, notional = size * ent, fee = notional * FEE * 2;
+      out = [['Risiko', risk.toFixed(2) + ' USDT'], ['Ukuran', size.toFixed(3) + ' XAU'], ['Kontrak OKX', ct.toLocaleString('en-US')], ['Nilai posisi', Math.round(notional).toLocaleString('en-US') + ' USDT'], ['Leverage min.', (notional / eq).toFixed(2) + '×'], ['Fee PP', fee.toFixed(2) + ' (' + (fee / risk).toFixed(2) + 'R)']]
+        .map(function (p) { return '<div class="out"><div class="k">' + p[0] + '</div><div class="v">' + p[1] + '</div></div>'; }).join('');
+    }
+    $('sizeOut').innerHTML = out;
+
+    // forward test
+    var sig = S.sigs && S.sigs.signals ? S.sigs.signals.slice().reverse() : [];
+    var done = sig.filter(function (s) { return s.status && s.status !== 'OPEN'; });
+    $('fN').textContent = done.length;
+    if (done.length) {
+      var w = done.filter(function (s) { return s.r > 0; }).length, tot = done.reduce(function (a, s) { return a + s.r_net; }, 0);
+      $('fW').textContent = Math.round(w / done.length * 100) + '%';
+      $('fA').textContent = (tot / done.length >= 0 ? '+' : '') + (tot / done.length).toFixed(2) + 'R';
+      $('fT').textContent = (tot >= 0 ? '+' : '') + tot.toFixed(2) + 'R';
+    }
+    if (sig.length) {
+      $('hist').innerHTML = sig.slice(0, 30).map(function (s) {
+        var res = s.status === 'OPEN' ? '<span class="muted">jalan</span>' : '<span class="' + (s.r_net >= 0 ? 'pos' : 'neg') + '">' + s.status + ' ' + (s.r_net >= 0 ? '+' : '') + s.r_net.toFixed(2) + 'R</span>';
+        return '<tr><td class="num">' + wib(Date.parse(s.t), true) + '</td><td class="' + (s.dir === 1 ? 'pos' : 'neg') + '">' + (s.dir === 1 ? 'Long' : 'Short') + '</td><td class="r num">' + f1(s.entry) + '</td><td class="r num">' + res + '</td></tr>';
+      }).join('');
+    }
+    // status bot
+    var up = S.sigs && S.sigs.updated ? Date.parse(S.sigs.updated) : null;
+    $('botStatus').textContent = up ? 'Radar Telegram terakhir jalan ' + wib(up, true) + ' WIB' + (now - up > 3 * H ? ' — lebih dari 3 jam lalu, cek tab Actions di GitHub.' : '.') : 'Radar Telegram belum pernah jalan.';
+  }
+
+  async function full() {
+    try { await Promise.all([loadRepo(), loadPrice()]); render(); await loadCandles(); render(); }
+    catch (e) { $('conn').className = 'dot err'; $('pxTime').textContent = 'gagal memuat data OKX, coba muat ulang'; }
+  }
+  try { var saved = JSON.parse(localStorage.getItem('xau-size') || 'null'); if (saved) { $('eq').value = saved.eq; $('rk').value = saved.rk; } } catch (e) {}
+  ['eq', 'rk'].forEach(function (id) { $(id).addEventListener('input', function () { try { localStorage.setItem('xau-size', JSON.stringify({ eq: $('eq').value, rk: $('rk').value })); } catch (e) {} render(); }); });
+  $('refresh').addEventListener('click', full);
+  full();
+  setInterval(function () { loadPrice().then(render); }, 10000);
+  setInterval(function () { var m = new Date().getUTCMinutes(); if (Date.now() - S.loadedAt > 5 * 60e3 || m === 1) { loadCandles().then(render).catch(function () {}); loadRepo().then(render); } }, 60000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) full(); });
+})();
+</script>
+</body>
+</html>
