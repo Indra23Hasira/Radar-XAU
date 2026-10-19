@@ -37,3 +37,11 @@ Harga 4.193,5; H4 netral (EMA50 4.170,5 < EMA200 4.219,0); D1 turun (EMA20 4.186
 - Ide uji berikutnya (belum diuji): entry limit/maker, SL lebih lebar (3ATR/72j lebih baik di OOS: +0,076R net), filter ATR/harga.
 
 Script: `claude/radar_xau_bt.py` (mesin backtest; data diambil ulang dari OKX/Yahoo/FRED).
+
+## Versi live — GitHub + Telegram (19 Okt 2026)
+Repo `Indra23Hasira/Radar-XAU` (public). Dashboard GitHub Pages: https://indra23hasira.github.io/Radar-XAU/ (fetch OKX langsung dari browser; makro & sinyal dari `data/*.json`).
+- `scripts/radar_xau.py` dijalankan GitHub Actions (`.github/workflows/radar.yml`): tiap 15 menit 07–16 UTC Sen–Jum, tiap jam di luar sesi, Sabtu s/d 17 UTC untuk memantau posisi Jumat. Telegram pakai bot & chat yang sama dengan Radar BTC (secrets `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, label pesan `[XAU]`). Pesan: SETUP v1 valid, HASIL (TP/SL/24 jam), sekali "radar aktif" saat run pertama, dan "gagal jalan" maks 1x/6 jam.
+- Data candle: OKX 1H (200), 4H (1200), 1Dutc (300) — bar 4H & 1Dutc OKX identik dengan resample UTC. H4 = bar terakhir yang tutup ≤ waktu buka candle H1 pemicu; D1 = hari UTC sebelumnya; makro = baris bertanggal ≤ hari − 2 (sama dengan backtest).
+- Verifikasi: replay script live di data historis → 78 sinyal identik dengan backtest (entry & R sama persis; 4 trade awal Apr 2025 beda karena warmup EMA). Logika JS dashboard dicek sama dengan Python di 1.754 candle H1 (0 beda). VIX di backtest tidak memengaruhi skor makro → tidak diambil.
+- FRED `fredgraph.csv` menggantung kalau User-Agent browser/tidak dikenal; pakai UA `curl/8.5.0`. Pakai `&cosd=` supaya ringan. Yahoo DXY: query1 → query2 → worker proxy.
+- State: `data/signals.json` (jurnal forward test otomatis), `data/macro.json` (stale=true kalau ambil makro gagal). Workflow commit hanya kalau ada perubahan.

@@ -9,7 +9,7 @@ Logika identik dengan backtest #1 (19 Okt 2026, lihat backtest/bt.py):
   - entry open H1 berikutnya, SL 2xATR14 H1, TP 2R, batas 24 jam, satu posisi per waktu
 Hasil dicek di candle M15; kalau SL dan TP kena di candle yang sama dihitung SL.
 """
-import json, os, sys, time, csv, io, urllib.request, urllib.parse
+import json, os, sys, time, csv, io, urllib.request, urllib.parse, urllib.error
 from datetime import datetime, timedelta, timezone
 import numpy as np, pandas as pd
 
@@ -207,6 +207,8 @@ def send(text):
         try:
             r = json.load(urllib.request.urlopen(f"https://api.telegram.org/bot{tok}/sendMessage", data=data, timeout=30))
             if r.get("ok"): return True
+        except urllib.error.HTTPError as e:
+            print(f"::error::Telegram menolak pesan ({e.code}): {e.read().decode()[:200]}"); return False
         except Exception as e:
             print("telegram gagal:", e); time.sleep(3)
     return False
@@ -313,15 +315,19 @@ def run(now=None):
         if u:
             s.update(u); s["r_net"] = round(s["r"] - FEE_RT * e / risk, 3); s["r"] = round(s["r"], 3); send(msg_result(s, sigs))
 
-    if first_run:
+    if not state.get("hello_sent"):
         st = evaluate(h1.index[-1], h1, h4, d1, mrows)
         tr = {1: "naik", -1: "turun", 0: "netral"}
-        send(f"<b>[XAU] Radar XAU/USDT aktif</b>\nAlert setup v1 dan hasilnya akan dikirim ke chat ini.\n"
+        state["hello_sent"] = send(f"<b>[XAU] Radar XAU/USDT aktif</b>\nAlert setup v1 dan hasilnya akan dikirim ke chat ini.\n"
              f"Sekarang: H4 {tr[st['trend']]}, D1 {tr[st['dtrend']]}, makro {sgn(st['macro'])}.")
     state["updated"] = now.isoformat()
     save(STATE, state)
 
 if __name__ == "__main__":
+    if not DRY and not (os.environ.get("TELEGRAM_BOT_TOKEN") and os.environ.get("TELEGRAM_CHAT_ID")):
+        print("::error::Secret TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID kosong. Isi di Settings > Secrets and variables > Actions > tab Secrets > Repository secrets.")
+        try: run()
+        finally: sys.exit(1)
     try:
         run()
     except Exception as e:
