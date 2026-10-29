@@ -1,0 +1,43 @@
+{
+ "events": [
+  {
+   "t": "2026-10-28T18:00:00+00:00",
+   "title": "FOMC Statement",
+   "forecast": "",
+   "previous": "",
+   "sent": true,
+   "reaction": {
+    "open": 4049.9,
+    "m15": -0.183,
+    "m60": -0.198,
+    "m240": 0.605
+   }
+  },
+  {
+   "t": "2026-10-28T18:00:00+00:00",
+   "title": "Federal Funds Rate",
+   "forecast": "4.00%",
+   "previous": "4.00%",
+   "sent": true,
+   "reaction": {
+    "open": 4049.9,
+    "m15": -0.183,
+    "m60": -0.198,
+    "m240": 0.605
+   }
+  },
+  {
+   "t": "2026-10-28T18:30:00+00:00",
+   "title": "FOMC Press Conference",
+   "forecast": "",
+   "previous": "",
+   "sent": true,
+   "reaction": {
+    "open": 4045.0,
+    "m15": 0.438,
+    "m60": 0.4,
+    "m240": 0.423
+   }
+  }
+ ]
+}
