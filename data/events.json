@@ -46,6 +46,36 @@
     "m60": 0.4,
     "m240": 0.423
    }
+  },
+  {
+   "t": "2026-10-29T12:30:00+00:00",
+   "title": "Advance GDP q/q",
+   "forecast": "3.2%",
+   "previous": "1.5%",
+   "sent": false,
+   "reaction": {
+    "open": 4032.5,
+    "m15": 0.02
+   }
+  },
+  {
+   "t": "2026-10-29T12:30:00+00:00",
+   "title": "Core PCE Price Index m/m",
+   "forecast": "0.3%",
+   "previous": "0.2%",
+   "sent": false,
+   "actual": {
+    "value": 0.3,
+    "text": "0.3%",
+    "obs": "2026-09-01",
+    "series": "PCEPILFE"
+   },
+   "reaction": {
+    "open": 4032.5,
+    "m15": 0.02
+   },
+   "surprise_dir": 0,
+   "surprise_text": "sesuai proyeksi → reaksi biasanya kecil"
   }
  ]
 }
