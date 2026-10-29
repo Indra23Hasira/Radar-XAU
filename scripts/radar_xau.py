@@ -231,6 +231,7 @@ def msg_setup(s):
             f"H4 {tick(s['trend']==d)} · D1 {tick(s['dtrend']==d)} · Makro {sgn(s['macro'])} {tick(s['macro']*d>=0)}"
             + (f" (DXY {mr['dxy_ch5']:+.2f}%, yield riil {mr['ry_ch5']:+.2f}, data {mr['date']})\n" if mr else " (data makro tidak tersedia, dianggap netral)\n") +
             f"Ukuran per {RISK_USDT:.0f} USDT risiko: {ct*CT_VAL:.3f} XAU = {ct} kontrak OKX · fee ≈ {fee_r:.2f}R\n\n"
+            + ("⚠ <b>Rilis 3★ AS selama posisi:</b>\n" + "\n".join("• " + x for x in s["events"]) + "\n\n" if s.get("events") else "") +
             f"Level dari harga OKX. Di MetaTrader pakai jaraknya (SL {s['risk']:.1f} / TP {s['risk']*TP_R:.1f}).\n"
             f"<i>Masih forward test — catat hasilnya.</i>")
 
@@ -274,6 +275,12 @@ def run(now=None):
         mrows = old["rows"] if old else []
         if old and not old.get("stale"): old["stale"] = True; save(MACRO, old)
 
+    try:
+        import kalender as K
+        cal = K.refresh(state, now)
+    except Exception as e:
+        print("kalender error:", e); K = None; cal = {"events": []}
+
     h1, _ = okx_candles("1H", 200)
     h4, _ = okx_candles("4H", 1200)
     d1, _ = okx_candles("1Dutc", 300)
@@ -309,6 +316,8 @@ def run(now=None):
                  sl=round(e - d * risk, 2), tp=round(e + d * TP_R * risk, 2), deadline=(entry_t + pd.Timedelta(hours=MAX_H)).isoformat(),
                  status="OPEN", sent_at=now.isoformat())
         s.pop("macro_row", None); s["macro_detail"] = st.get("macro_row")
+        if K:
+            s["events"] = [K.fmt_event(x) for x in K.upcoming(cal, entry_t - pd.Timedelta(hours=1), entry_t + pd.Timedelta(hours=MAX_H))]
         sigs.append(s)
         send(msg_setup(dict(s, macro_row=st.get("macro_row"))))
         u = resolve(s, okx_15m_since(entry_t))   # kalau notifikasi telat dan sudah selesai
@@ -320,6 +329,9 @@ def run(now=None):
         tr = {1: "naik", -1: "turun", 0: "netral"}
         state["hello_sent"] = send(f"<b>[XAU] Radar XAU/USDT aktif</b>\nAlert setup v1 dan hasilnya akan dikirim ke chat ini.\n"
              f"Sekarang: H4 {tr[st['trend']]}, D1 {tr[st['dtrend']]}, makro {sgn(st['macro'])}.")
+    if K:
+        try: K.process(cal, now)
+        except Exception as e: print("proses rilis error:", e)
     state["updated"] = now.isoformat()
     save(STATE, state)
 

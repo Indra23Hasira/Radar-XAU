@@ -123,6 +123,17 @@
   </section>
 
   <section class="card">
+    <h2>Kalender 3★ AS (data berdampak tinggi)</h2>
+    <p class="small muted">Jadwal & proyeksi: ForexFactory. Aktual: FRED (rilis pertama). Gerak emas: OKX setelah rilis. Arah "condong" = pola umum, belum teruji.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Waktu (WIB)</th><th>Data</th><th class="r">Proyeksi</th><th class="r">Sebelum</th><th class="r">Aktual</th><th class="r">Emas 1 jam</th></tr></thead>
+        <tbody id="calRows"><tr><td colspan="6" class="muted small">Kalender belum tersedia.</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
     <h2>Forward test (dari alert Telegram)</h2>
     <div class="grid2">
       <div class="out"><div class="k">Sinyal selesai</div><div class="v" id="fN">0</div></div>
@@ -280,6 +291,8 @@ if (typeof module !== 'undefined') module.exports = XAU;
     try { S.macro = await getJSON('data/macro.json?ts=' + Date.now()); } catch (e) { S.macro = null; }
     try { S.sigs = await getJSON('data/signals.json?ts=' + Date.now()); } catch (e) { S.sigs = null; }
     try { S.evalr = await getJSON('data/backtest.json?ts=' + Date.now()); } catch (e) { S.evalr = null; }
+    try { S.cal = await getJSON('data/calendar.json?ts=' + Date.now()); } catch (e) { S.cal = null; }
+    try { S.evts = await getJSON('data/events.json?ts=' + Date.now()); } catch (e) { S.evts = null; }
   }
   async function loadPrice() {
     try {
@@ -293,7 +306,7 @@ if (typeof module !== 'undefined') module.exports = XAU;
   function row(k, v, cls) { return '<tr><td>' + k + '</td><td class="r num ' + (cls || '') + '">' + v + '</td></tr>'; }
 
   function render() {
-    renderEval();
+    renderEval(); renderCal();
     if (S.px != null) {
       $('px').textContent = f1(S.px);
       var ch = S.open24 ? (S.px / S.open24 - 1) * 100 : null;
@@ -386,6 +399,22 @@ if (typeof module !== 'undefined') module.exports = XAU;
     $('botStatus').textContent = up ? 'Radar Telegram terakhir jalan ' + wib(up, true) + ' WIB' + (now - up > 3 * H ? ' — lebih dari 3 jam lalu, cek tab Actions di GitHub.' : '.') : 'Radar Telegram belum pernah jalan.';
   }
 
+
+
+  function renderCal() {
+    var cal = S.cal && S.cal.events ? S.cal.events : [], log = {};
+    (S.evts && S.evts.events || []).forEach(function (e) { log[e.t + '|' + e.title] = e; });
+    var now = Date.now(), rows = cal.filter(function (e) { var t = Date.parse(e.t); return t >= now - 2 * D && t <= now + 7 * D; });
+    if (!rows.length) return;
+    $('calRows').innerHTML = rows.map(function (e) {
+      var t = Date.parse(e.t), r = log[e.t + '|' + e.title] || {}, a = r.actual ? r.actual.text : (t < now ? '…' : '');
+      var rx = r.reaction && r.reaction.m60 != null ? (r.reaction.m60 >= 0 ? '+' : '') + r.reaction.m60.toFixed(2) + '%' : '';
+      var dir = r.surprise_dir === 1 ? ' pos' : r.surprise_dir === -1 ? ' neg' : '';
+      var soon = t > now && t - now < 6 * H;
+      return '<tr' + (soon ? ' style="background:var(--gold-bg);"' : '') + '><td class="num">' + wib(t, true) + '</td><td>' + e.title + '</td><td class="r num">' + (e.forecast || '–') +
+        '</td><td class="r num">' + (e.previous || '–') + '</td><td class="r num' + dir + '">' + (a || '–') + '</td><td class="r num ' + (rx.charAt(0) === '+' ? 'pos' : rx ? 'neg' : '') + '">' + (rx || '–') + '</td></tr>';
+    }).join('');
+  }
 
   function renderEval() {
     var E = S.evalr; if (!E || !E.periods) return;

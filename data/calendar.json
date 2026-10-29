@@ -1,0 +1,34 @@
+{
+ "events": [
+  {
+   "t": "2026-10-28T18:00:00+00:00",
+   "title": "FOMC Statement",
+   "forecast": "",
+   "previous": ""
+  },
+  {
+   "t": "2026-10-28T18:00:00+00:00",
+   "title": "Federal Funds Rate",
+   "forecast": "4.00%",
+   "previous": "4.00%"
+  },
+  {
+   "t": "2026-10-28T18:30:00+00:00",
+   "title": "FOMC Press Conference",
+   "forecast": "",
+   "previous": ""
+  },
+  {
+   "t": "2026-10-29T12:30:00+00:00",
+   "title": "Advance GDP q/q",
+   "forecast": "3.2%",
+   "previous": "1.5%"
+  },
+  {
+   "t": "2026-10-29T12:30:00+00:00",
+   "title": "Core PCE Price Index m/m",
+   "forecast": "0.3%",
+   "previous": "0.2%"
+  }
+ ]
+}
