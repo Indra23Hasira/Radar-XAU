@@ -52,18 +52,26 @@
    "title": "Advance GDP q/q",
    "forecast": "3.2%",
    "previous": "1.5%",
-   "sent": false,
+   "sent": true,
    "reaction": {
     "open": 4032.5,
     "m15": 0.02
-   }
+   },
+   "actual": {
+    "value": 3.4,
+    "text": "3.4%",
+    "obs": "2026-07-01",
+    "series": "A191RL1Q225SBEA"
+   },
+   "surprise_dir": -1,
+   "surprise_text": "lebih panas/kuat dari proyeksi → biasanya dolar & yield naik, condong NEGATIF untuk emas"
   },
   {
    "t": "2026-10-29T12:30:00+00:00",
    "title": "Core PCE Price Index m/m",
    "forecast": "0.3%",
    "previous": "0.2%",
-   "sent": false,
+   "sent": true,
    "actual": {
     "value": 0.3,
     "text": "0.3%",
