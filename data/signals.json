@@ -1,8 +1,49 @@
 {
- "signals": [],
- "last_bar": "2026-10-29T10:00:00+00:00",
+ "signals": [
+  {
+   "t": "2026-10-29T11:00:00+00:00",
+   "close": 4028.5,
+   "atr": 14.95655510828959,
+   "trend": -1,
+   "dtrend": -1,
+   "h4_close": 4031.5,
+   "ema50": 4054.9352091792043,
+   "ema200": 4144.237496054885,
+   "d_ema20": 4100.624939329451,
+   "d_ema50": 4181.56795763761,
+   "macro": 0,
+   "ah": 4074.8,
+   "al": 4031.3,
+   "dir": -1,
+   "raw_dir": -1,
+   "id": "2026102911",
+   "entry_t": "2026-10-29T12:00:00+00:00",
+   "entry": 4028.4,
+   "risk": 29.913,
+   "sl": 4058.31,
+   "tp": 3968.57,
+   "deadline": "2026-10-30T12:00:00+00:00",
+   "status": "OPEN",
+   "sent_at": "2026-10-29T12:00:48.766481+00:00",
+   "macro_detail": {
+    "date": "2026-10-27",
+    "dxy": 102.32,
+    "ry": 2.64,
+    "dxy_ch5": 0.58,
+    "ry_ch5": -0.13,
+    "s_dxy": -1,
+    "s_ry": 1,
+    "macro": 0
+   },
+   "events": [
+    "Advance GDP q/q Kam 29 Okt 19:30 WIB (proyeksi 3.2%, sebelumnya 1.5%)",
+    "Core PCE Price Index m/m Kam 29 Okt 19:30 WIB (proyeksi 0.3%, sebelumnya 0.2%)"
+   ]
+  }
+ ],
+ "last_bar": "2026-10-29T11:00:00+00:00",
  "last_error_sent": null,
- "updated": "2026-10-29T11:45:53.433551+00:00",
+ "updated": "2026-10-29T12:00:48.766481+00:00",
  "hello_sent": true,
  "calendar_checked": "2026-10-29T11:00:53.928203+00:00"
 }
