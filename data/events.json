@@ -24,7 +24,15 @@
     "m15": -0.183,
     "m60": -0.198,
     "m240": 0.605
-   }
+   },
+   "actual": {
+    "value": 4.0,
+    "text": "4.00%",
+    "obs": "2026-10-29",
+    "series": "DFEDTARU"
+   },
+   "surprise_dir": 0,
+   "surprise_text": "sesuai proyeksi → reaksi biasanya kecil"
   },
   {
    "t": "2026-10-28T18:30:00+00:00",
