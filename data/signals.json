@@ -23,7 +23,7 @@
    "sl": 4058.31,
    "tp": 3968.57,
    "deadline": "2026-10-30T12:00:00+00:00",
-   "status": "OPEN",
+   "status": "WAKTU",
    "sent_at": "2026-10-29T12:00:48.766481+00:00",
    "macro_detail": {
     "date": "2026-10-27",
@@ -38,12 +38,16 @@
    "events": [
     "Advance GDP q/q Kam 29 Okt 19:30 WIB (proyeksi 3.2%, sebelumnya 1.5%)",
     "Core PCE Price Index m/m Kam 29 Okt 19:30 WIB (proyeksi 0.3%, sebelumnya 0.2%)"
-   ]
+   ],
+   "exit_t": "2026-10-30T12:00:00+00:00",
+   "exit": 3976.5,
+   "r": 1.735,
+   "r_net": 1.6
   }
  ],
- "last_bar": "2026-10-30T10:00:00+00:00",
+ "last_bar": "2026-10-30T11:00:00+00:00",
  "last_error_sent": null,
- "updated": "2026-10-30T11:45:50.080505+00:00",
+ "updated": "2026-10-30T12:00:47.188002+00:00",
  "hello_sent": true,
  "calendar_checked": "2026-10-30T09:00:51.000686+00:00"
 }
