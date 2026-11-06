@@ -88,6 +88,39 @@
    },
    "surprise_dir": 0,
    "surprise_text": "sesuai proyeksi → reaksi biasanya kecil"
+  },
+  {
+   "t": "2026-11-06T13:30:00+00:00",
+   "title": "Average Hourly Earnings m/m",
+   "forecast": "0.3%",
+   "previous": "0.1%",
+   "sent": false,
+   "reaction": {
+    "open": 4066.3,
+    "m15": -0.278
+   }
+  },
+  {
+   "t": "2026-11-06T13:30:00+00:00",
+   "title": "Non-Farm Employment Change",
+   "forecast": "65K",
+   "previous": "29K",
+   "sent": false,
+   "reaction": {
+    "open": 4066.3,
+    "m15": -0.278
+   }
+  },
+  {
+   "t": "2026-11-06T13:30:00+00:00",
+   "title": "Unemployment Rate",
+   "forecast": "4.2%",
+   "previous": "4.2%",
+   "sent": false,
+   "reaction": {
+    "open": 4066.3,
+    "m15": -0.278
+   }
   }
  ]
 }
