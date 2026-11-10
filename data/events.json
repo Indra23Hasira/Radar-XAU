@@ -151,6 +151,28 @@
    },
    "surprise_dir": -1,
    "surprise_text": "lebih panas/kuat dari proyeksi → biasanya dolar & yield naik, condong NEGATIF untuk emas"
+  },
+  {
+   "t": "2026-11-10T13:30:00+00:00",
+   "title": "CPI m/m",
+   "forecast": "0.3%",
+   "previous": "0.6%",
+   "sent": false,
+   "reaction": {
+    "open": 4079.2,
+    "m15": -0.368
+   }
+  },
+  {
+   "t": "2026-11-10T13:30:00+00:00",
+   "title": "Core CPI m/m",
+   "forecast": "0.2%",
+   "previous": "0.3%",
+   "sent": false,
+   "reaction": {
+    "open": 4079.2,
+    "m15": -0.368
+   }
   }
  ]
 }
