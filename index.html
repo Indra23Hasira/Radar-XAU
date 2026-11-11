@@ -273,7 +273,20 @@ if (typeof module !== 'undefined') module.exports = XAU;
 
 <script>
 (function () {
-  var INST = 'XAU-USDT-SWAP', API = 'https://www.okx.com/api/v5/market/';
+  var INST = 'XAU-USDT-SWAP';
+  /* OKX langsung bisa diblokir provider di HP -> cadangan lewat worker Cloudflare radar-xau-cron */
+  var APIS = ['https://www.okx.com/api/v5/market/', 'https://radar-xau-cron.indraanggriawan17.workers.dev/okx/api/v5/market/'];
+  var API = APIS[0], apiIdx = 0, deadFallback = false;  /* cadangan dimatikan sekali gagal, supaya tidak dicoba berulang */
+  try { var sv = +sessionStorage.getItem('xau-api'); if (sv === 1) { apiIdx = 1; API = APIS[1]; } } catch (e) {}
+  function okx(path) {
+    function attempt(i) {
+      var ctl = new AbortController(), tm = setTimeout(function () { ctl.abort(); }, 6000);
+      return fetch(APIS[i] + path, { cache: 'no-store', signal: ctl.signal }).then(function (r) { clearTimeout(tm); if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (j) { if (j.code !== '0') throw new Error('OKX ' + j.code); if (i !== apiIdx) { apiIdx = i; API = APIS[i]; try { sessionStorage.setItem('xau-api', String(i)); } catch (e) {} } return j; })
+        .catch(function (e) { clearTimeout(tm); if (i > 0) deadFallback = true; if (i + 1 < APIS.length && i === apiIdx && !deadFallback) return attempt(i + 1); throw e; });
+    }
+    return attempt(apiIdx);
+  }
   var H = XAU.H, D = XAU.D, FEE = 0.0005;
   var S = { h1: null, h4: null, d1: null, macro: null, sigs: null, px: null, pxT: null, loadedAt: 0 };
   var BULAN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], HARI = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
@@ -288,7 +301,7 @@ if (typeof module !== 'undefined') module.exports = XAU;
   async function candles(bar, n) {
     var rows = {}, after = '', guard = 0;
     while (Object.keys(rows).length < n + 2 && guard++ < 20) {
-      var j = await getJSON(API + 'history-candles?instId=' + INST + '&bar=' + bar + '&limit=100' + (after ? '&after=' + after : ''));
+      var j = await okx('history-candles?instId=' + INST + '&bar=' + bar + '&limit=100' + (after ? '&after=' + after : ''));
       if (j.code !== '0' || !j.data.length) break;
       j.data.forEach(function (r) { rows[r[0]] = r; }); after = j.data[j.data.length - 1][0];
       await sleep(120);
@@ -315,7 +328,7 @@ if (typeof module !== 'undefined') module.exports = XAU;
   }
   async function loadPrice() {
     try {
-      var j = await getJSON(API + 'ticker?instId=' + INST);
+      var j = await okx('ticker?instId=' + INST);
       S.px = +j.data[0].last; S.pxT = +j.data[0].ts; S.open24 = +j.data[0].sodUtc0;
       $('conn').className = 'dot ok';
     } catch (e) { $('conn').className = 'dot err'; }
@@ -484,7 +497,7 @@ if (typeof module !== 'undefined') module.exports = XAU;
 
   async function full() {
     try { await Promise.all([loadRepo(), loadPrice()]); render(); await loadCandles(); render(); }
-    catch (e) { $('conn').className = 'dot err'; $('pxTime').textContent = 'gagal memuat data OKX, coba muat ulang'; }
+    catch (e) { $('conn').className = 'dot err'; $('pxTime').textContent = 'data OKX tidak bisa diambil (' + (e && e.message || 'jaringan') + ')'; $('verdict').className = 'pill wait'; $('verdict').textContent = 'Data harga tidak tersedia'; $('reason').textContent = 'Alert Telegram tetap jalan dari server. Coba muat ulang, atau ganti jaringan (Wi-Fi/seluler).'; }
   }
   try { var saved = JSON.parse(localStorage.getItem('xau-size') || 'null'); if (saved) { $('eq').value = saved.eq; $('rk').value = saved.rk; } } catch (e) {}
   ['eq', 'rk'].forEach(function (id) { $(id).addEventListener('input', function () { try { localStorage.setItem('xau-size', JSON.stringify({ eq: $('eq').value, rk: $('rk').value })); } catch (e) {} render(); }); });
