@@ -175,6 +175,37 @@ def evaluate_all(m15, h1, live):
     out["flags"] = flags
     return out, tr
 
+def evaluate_lw(m15, dxy, ry):
+    import lw_core as LW
+    d1 = resample(m15, "1D"); d1["ema20"] = R.ema(d1.c, 20); d1["ema50"] = R.ema(d1.c, 50); d1["dtrend"] = np.where(d1.ema20 > d1.ema50, 1, -1)
+    m = pd.DataFrame({"dxy": dxy, "ry": ry}).sort_index().ffill()
+    m["dxy_ch5"] = m.dxy.pct_change(5) * 100; m["ry_ch5"] = m.ry.diff(5)
+    m["macro"] = np.where(m.dxy_ch5 < -0.5, 1, np.where(m.dxy_ch5 > 0.5, -1, 0)) + np.where(m.ry_ch5 < -0.05, 1, np.where(m.ry_ch5 > 0.05, -1, 0))
+    mrows = [dict(date=str(i.date()), macro=int(r.macro)) for i, r in m.dropna().iterrows()]
+    t = LW.backtest(m15, d1, mrows)
+    now = m15.index[-1]
+    main_ = t[~t.senin]
+    per = {"semua": main_, "6 bulan": main_[main_.day >= now - pd.Timedelta(days=182)], "3 bulan": main_[main_.day >= now - pd.Timedelta(days=91)],
+           "sejak live": main_[main_.day >= LW.LIVE_START]}
+    out = {"periods": {k: stats(v.assign(t=v.day)) for k, v in per.items()}, "senin": stats(t[t.senin].assign(t=t[t.senin].day))}
+    try: lv = [x for x in json.load(open(LW.STATE))["days"] if x.get("status") in ("SL", "CLOSE")]
+    except Exception: lv = []
+    lmain = [x for x in lv if not x["senin"]]
+    bset = {(d.date().isoformat(), int(di)): round(float(r), 3) for d, di, r in zip(t.day, t.dir, t.r) if d >= LW.LIVE_START}
+    lset = {(x["day"], int(x["dir"])): x["r"] for x in lv}
+    last = max([x["day"] for x in lv], default=None)
+    out["live"] = dict(selesai=len(lmain), senin=len(lv) - len(lmain), cocok=sum(1 for k in lset if k in bset),
+                       hanya_live=[k[0] for k in lset if k not in bset], hanya_backtest=[k[0] for k in bset if k not in lset and last and k[0] <= last],
+                       stats=stats(pd.DataFrame([dict(r=x["r"], r_net=x["r_net"]) for x in lmain])) if lmain else dict(n=0))
+    flags = []
+    p6, p3 = out["periods"]["6 bulan"], out["periods"]["3 bulan"]
+    if p6.get("n", 0) >= 10 and p6["avg"] < 0: flags.append(f"LW: rata-rata 6 bulan negatif ({p6['avg']:+.2f}R, n={p6['n']}).")
+    elif p3.get("n", 0) >= 6 and p3["avg"] < 0: flags.append(f"LW: rata-rata 3 bulan negatif ({p3['avg']:+.2f}R, n={p3['n']}).")
+    L_ = out["live"]
+    if L_["hanya_live"] or L_["hanya_backtest"]: flags.append("LW: transaksi live tidak sama dengan backtest, perlu dicek.")
+    out["flags"] = flags
+    return out
+
 def msg(rep):
     p = rep["periods"]; L = rep["live"]
     def line(k):
@@ -188,6 +219,13 @@ def msg(rep):
            + "\n".join(line(k) for k in ("semua", "6 bulan", "3 bulan", "sejak live")) +
            f"\n\nFilter 6 bulan: lolos {fl('lolos semua filter')} · diblok D1 {fl('diblok D1')} · diblok makro {fl('diblok makro')}\n"
            f"Live: {L['selesai']} sinyal selesai, {L['cocok']} cocok dengan backtest\n\n")
+    if rep.get("lw"):
+        lw = rep["lw"]; pl = lw["periods"]
+        def l2(k): s = pl[k]; return f"{k}: {s['n']} · win {s['win']:.0f}% · {s['avg']:+.2f}R" if s.get("n") else f"{k}: belum ada"
+        txt += ("<b>[XAU-LW] strategi kedua (Sel–Jum)</b>\n" + "\n".join(l2(k) for k in ("semua", "6 bulan", "3 bulan", "sejak live")) +
+                (f"\nSenin (eksperimen, backtest): {lw['senin']['n']} · {lw['senin']['avg']:+.2f}R" if lw["senin"].get("n") else "") +
+                f"\nLive: {lw['live']['selesai']} transaksi selesai, {lw['live']['cocok']} cocok dengan backtest\n\n")
+        rep["flags"] = rep["flags"] + [f for f in lw["flags"] if f not in rep["flags"]]
     txt += ("<b>Perlu perhatian:</b>\n" + "\n".join("• " + x for x in rep["flags"])) if rep["flags"] else "Tidak ada tanda peringatan."
     return txt
 
@@ -199,6 +237,8 @@ def main():
     try: live = json.load(open(R.STATE))["signals"]
     except Exception: live = []
     rep, tr = evaluate_all(m15, h1, live)
+    try: rep["lw"] = evaluate_lw(m15, dxy, ry)
+    except Exception as e: print("evaluasi LW gagal:", e)
     rep.update(generated=gen.isoformat(), data_from=m15.index[0].isoformat(), data_to=(m15.index[-1] + pd.Timedelta(minutes=15)).isoformat(),
                candles=int(len(m15)), rules="v1: breakout range Asia + tren H4 + D1 + veto makro, SL 2xATR14 H1, TP 2R, 24 jam, fee taker 0,05%/sisi",
                equity=[dict(t=t.isoformat()[:16], r=round(float(r), 3)) for t, r in zip(tr.t, tr.r_net)])

@@ -332,6 +332,11 @@ def run(now=None):
     if K:
         try: K.process(cal, now)
         except Exception as e: print("proses rilis error:", e)
+    try:
+        import lw_core
+        lw_core.live(d1, mrows, now)
+    except Exception as e:
+        print("LW error:", e)
     state["updated"] = now.isoformat()
     save(STATE, state)
 

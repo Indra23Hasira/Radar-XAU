@@ -134,6 +134,24 @@
   </section>
 
   <section class="card">
+    <h2>Strategi kedua [XAU-LW] — breakout harian (forward test)</h2>
+    <p class="small muted">Garis = open hari ini (07:00 WIB) ± ½ range kemarin. Sentuhan pertama menentukan arah, hanya diambil kalau searah tren D1 dan makro tidak berlawanan. SL di open, tutup besok 07:00 WIB. Senin = eksperimen.</p>
+    <div id="lwToday" class="small">Belum ada data. Forward test mulai Kamis 12 Nov 2026.</div>
+    <div class="grid2">
+      <div class="out"><div class="k">Selesai (Sel–Jum)</div><div class="v" id="lwN">0</div></div>
+      <div class="out"><div class="k">Win rate</div><div class="v" id="lwW">–</div></div>
+      <div class="out"><div class="k">Total (net)</div><div class="v" id="lwT">–</div></div>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Hari</th><th>Status</th><th>Arah</th><th class="r">Entry</th><th class="r">Hasil</th></tr></thead>
+        <tbody id="lwRows"><tr><td colspan="5" class="muted small">Belum ada transaksi.</td></tr></tbody>
+      </table>
+    </div>
+    <p class="small muted">Backtest Apr 2025–Nov 2026 (Sel–Jum): 84 transaksi, win 51%, +0,19R per transaksi setelah fee.</p>
+  </section>
+
+  <section class="card">
     <h2>Forward test (dari alert Telegram)</h2>
     <div class="grid2">
       <div class="out"><div class="k">Sinyal selesai</div><div class="v" id="fN">0</div></div>
@@ -291,6 +309,7 @@ if (typeof module !== 'undefined') module.exports = XAU;
     try { S.macro = await getJSON('data/macro.json?ts=' + Date.now()); } catch (e) { S.macro = null; }
     try { S.sigs = await getJSON('data/signals.json?ts=' + Date.now()); } catch (e) { S.sigs = null; }
     try { S.evalr = await getJSON('data/backtest.json?ts=' + Date.now()); } catch (e) { S.evalr = null; }
+    try { S.lw = await getJSON('data/lw.json?ts=' + Date.now()); } catch (e) { S.lw = null; }
     try { S.cal = await getJSON('data/calendar.json?ts=' + Date.now()); } catch (e) { S.cal = null; }
     try { S.evts = await getJSON('data/events.json?ts=' + Date.now()); } catch (e) { S.evts = null; }
   }
@@ -306,7 +325,7 @@ if (typeof module !== 'undefined') module.exports = XAU;
   function row(k, v, cls) { return '<tr><td>' + k + '</td><td class="r num ' + (cls || '') + '">' + v + '</td></tr>'; }
 
   function render() {
-    renderEval(); renderCal();
+    renderEval(); renderCal(); renderLW();
     if (S.px != null) {
       $('px').textContent = f1(S.px);
       var ch = S.open24 ? (S.px / S.open24 - 1) * 100 : null;
@@ -400,6 +419,27 @@ if (typeof module !== 'undefined') module.exports = XAU;
   }
 
 
+
+
+  function renderLW() {
+    var days = S.lw && S.lw.days ? S.lw.days.slice().reverse() : [];
+    if (!days.length) return;
+    var lab = { MENUNGGU: 'menunggu sentuhan', AKTIF: 'posisi jalan', SL: 'kena SL', CLOSE: 'ditutup', DIBLOK: 'batal (arah diblok)', AMBIGU: 'batal (dua garis kena)', SKIP: 'skip (filter)', TUTUP_TANPA_SENTUHAN: 'tidak tersentuh' };
+    var t0 = days[0], dd = Date.parse(t0.day + 'T00:00:00Z');
+    var allow = (t0.allowed || []).map(function (d) { return d === 1 ? 'BUY' : 'SELL'; }).join(' & ') || 'tidak ada';
+    var live = t0.status === 'AKTIF' && S.px ? ' · posisi sekarang ' + (t0.dir * (S.px - t0.entry) / Math.abs(t0.entry - t0.open)).toFixed(2) + 'R' : '';
+    $('lwToday').innerHTML = '<div class="note"><b>' + wib(dd, true).split(' ').slice(0, 3).join(' ') + (t0.senin ? ' (eksperimen Senin)' : '') + '</b>: garis BUY <span class="num">' + f1(t0.up) + '</span> · SELL <span class="num">' + f1(t0.dn) +
+      '</span> · SL/open <span class="num">' + f1(t0.open) + '</span><br>Arah diizinkan: <b>' + allow + '</b> · status: ' + (lab[t0.status] || t0.status || '–') + live + '</div>';
+    var done = days.filter(function (x) { return (x.status === 'SL' || x.status === 'CLOSE') && !x.senin; });
+    $('lwN').textContent = done.length;
+    if (done.length) { var w = done.filter(function (x) { return x.r > 0; }).length, tot = done.reduce(function (a, x) { return a + x.r_net; }, 0);
+      $('lwW').textContent = Math.round(w / done.length * 100) + '%'; $('lwT').textContent = (tot >= 0 ? '+' : '') + tot.toFixed(2) + 'R'; }
+    $('lwRows').innerHTML = days.slice(0, 30).map(function (x) {
+      var res = x.r_net != null ? '<span class="' + (x.r_net >= 0 ? 'pos' : 'neg') + '">' + (x.r_net >= 0 ? '+' : '') + x.r_net.toFixed(2) + 'R</span>' : '–';
+      return '<tr><td class="num">' + x.day.slice(5) + (x.senin ? ' (Sen)' : '') + '</td><td>' + (lab[x.status] || x.status || '–') + '</td><td class="' + (x.status !== 'SKIP' && x.dir === 1 ? 'pos' : x.status !== 'SKIP' && x.dir === -1 ? 'neg' : '') + '">' + (x.status === 'SKIP' ? '–' : x.dir === 1 ? 'Buy' : x.dir === -1 ? 'Sell' : '–') +
+        '</td><td class="r num">' + (x.entry ? f1(x.entry) : '–') + '</td><td class="r num">' + res + '</td></tr>';
+    }).join('');
+  }
 
   function renderCal() {
     var cal = S.cal && S.cal.events ? S.cal.events : [], log = {};
