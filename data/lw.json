@@ -13,9 +13,13 @@
    ],
    "senin": false,
    "sent": [
-    "plan"
+    "plan",
+    "entry"
    ],
-   "status": "MENUNGGU"
+   "status": "AKTIF",
+   "dir": -1,
+   "entry": 3940.75,
+   "entry_t": "2026-11-12 08:45:00+00:00"
   }
  ]
 }
