@@ -1,0 +1,21 @@
+{
+ "days": [
+  {
+   "day": "2026-11-12",
+   "open": 3985.4,
+   "range": 89.29999999999973,
+   "up": 4030.05,
+   "dn": 3940.75,
+   "dtrend": -1,
+   "macro": 0,
+   "allowed": [
+    -1
+   ],
+   "senin": false,
+   "sent": [
+    "plan"
+   ],
+   "status": "MENUNGGU"
+  }
+ ]
+}
