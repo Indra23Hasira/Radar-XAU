@@ -42,7 +42,8 @@
    "sent": [
     "plan"
    ],
-   "status": "MENUNGGU"
+   "status": "TUTUP_TANPA_SENTUHAN",
+   "final": true
   }
  ]
 }
