@@ -241,7 +241,7 @@
    "title": "Fed Chairman Warsh Speaks",
    "forecast": "",
    "previous": "",
-   "sent": false,
+   "sent": true,
    "reaction": {
     "open": 3870.1,
     "m15": 0.052,
