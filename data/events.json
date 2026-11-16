@@ -235,6 +235,17 @@
    },
    "surprise_dir": 1,
    "surprise_text": "lebih lemah/dingin dari proyeksi → biasanya dolar & yield turun, condong POSITIF untuk emas"
+  },
+  {
+   "t": "2026-11-16T17:00:00+00:00",
+   "title": "Fed Chairman Warsh Speaks",
+   "forecast": "",
+   "previous": "",
+   "sent": false,
+   "reaction": {
+    "open": 3870.1,
+    "m15": 0.052
+   }
   }
  ]
 }
