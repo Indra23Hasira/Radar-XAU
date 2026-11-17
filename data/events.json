@@ -264,7 +264,8 @@
    "reaction": {
     "open": 3864.8,
     "m15": -0.313,
-    "m60": 0.07
+    "m60": 0.07,
+    "m240": 0.261
    },
    "surprise_dir": -1,
    "surprise_text": "lebih panas/kuat dari proyeksi → biasanya dolar & yield naik, condong NEGATIF untuk emas"
@@ -284,7 +285,8 @@
    "reaction": {
     "open": 3864.8,
     "m15": -0.313,
-    "m60": 0.07
+    "m60": 0.07,
+    "m240": 0.261
    },
    "surprise_dir": -1,
    "surprise_text": "lebih panas/kuat dari proyeksi → biasanya dolar & yield naik, condong NEGATIF untuk emas"
