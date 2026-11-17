@@ -248,6 +248,44 @@
     "m60": -0.191,
     "m240": -0.313
    }
+  },
+  {
+   "t": "2026-11-17T13:30:00+00:00",
+   "title": "Core Retail Sales m/m",
+   "forecast": "0.4%",
+   "previous": "0.9%",
+   "sent": true,
+   "actual": {
+    "value": 0.6,
+    "text": "0.6%",
+    "obs": "2026-10-01",
+    "series": "RSFSXMV"
+   },
+   "reaction": {
+    "open": 3864.8,
+    "m15": -0.313
+   },
+   "surprise_dir": -1,
+   "surprise_text": "lebih panas/kuat dari proyeksi → biasanya dolar & yield naik, condong NEGATIF untuk emas"
+  },
+  {
+   "t": "2026-11-17T13:30:00+00:00",
+   "title": "Retail Sales m/m",
+   "forecast": "0.1%",
+   "previous": "0.8%",
+   "sent": true,
+   "actual": {
+    "value": 0.2,
+    "text": "0.2%",
+    "obs": "2026-10-01",
+    "series": "RSAFS"
+   },
+   "reaction": {
+    "open": 3864.8,
+    "m15": -0.313
+   },
+   "surprise_dir": -1,
+   "surprise_text": "lebih panas/kuat dari proyeksi → biasanya dolar & yield naik, condong NEGATIF untuk emas"
   }
  ]
 }
