@@ -89,6 +89,23 @@
    ],
    "status": "TUTUP_TANPA_SENTUHAN",
    "final": true
+  },
+  {
+   "day": "2026-11-18",
+   "open": 3855.1,
+   "range": 53.40000000000009,
+   "up": 3881.8,
+   "dn": 3828.3999999999996,
+   "dtrend": -1,
+   "macro": -2,
+   "allowed": [
+    -1
+   ],
+   "senin": false,
+   "sent": [
+    "plan"
+   ],
+   "status": "MENUNGGU"
   }
  ]
 }
