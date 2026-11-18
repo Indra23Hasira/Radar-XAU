@@ -296,7 +296,7 @@
    "title": "FOMC Meeting Minutes",
    "forecast": "",
    "previous": "",
-   "sent": false,
+   "sent": true,
    "reaction": {
     "open": 3745.0,
     "m15": -0.235,
