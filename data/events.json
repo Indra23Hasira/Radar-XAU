@@ -290,6 +290,17 @@
    },
    "surprise_dir": -1,
    "surprise_text": "lebih panas/kuat dari proyeksi → biasanya dolar & yield naik, condong NEGATIF untuk emas"
+  },
+  {
+   "t": "2026-11-18T19:00:00+00:00",
+   "title": "FOMC Meeting Minutes",
+   "forecast": "",
+   "previous": "",
+   "sent": false,
+   "reaction": {
+    "open": 3745.0,
+    "m15": -0.235
+   }
   }
  ]
 }
