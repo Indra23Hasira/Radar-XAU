@@ -130,7 +130,7 @@ def live(d1_all, mrows, now):
                        f"SL {fmt(o)} (jarak {risk:.1f}) · batal kalau harga ke {fmt(other)} dulu · tutup besok 07:00 WIB\n"
                        f"Posisi baru aktif saat masuk pesan <b>ENTRY</b>.\n"
                        f"Arah {arah} karena D1 {'naik' if dtr == 1 else 'turun'}, makro {R.sgn(mac)} · ukuran per {R.RISK_USDT:.0f} USDT risiko: {ct*R.CT_VAL:.3f} XAU = {ct} kontrak\n"
-                       f"Di MT5: pasang {arah} STOP {risk:.1f} poin {'di atas' if d == 1 else 'di bawah'} harga open harian broker, SL di open tersebut.\n"
+                       + R.mt5_block([(f"{arah} STOP", lvl), ("SL", o), ("batal di", other)], R.mt5_offset())
                        + ("<i>Senin = eksperimen, tidak dihitung di forward test utama.</i>" if rec["senin"] else "<i>Forward test — belum untuk uang sungguhan.</i>"))
             else:
                 why = "D1 & makro tidak searah" if dtr * mac < 0 else "arah dibatasi filter"

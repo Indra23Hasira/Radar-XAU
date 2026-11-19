@@ -216,23 +216,58 @@ def send(text):
 def tick(ok): return "✓" if ok else "✗"
 def sgn(m): return f"{m:+d}" if m else "0"
 
+# ------------------------------------------------------------------ konversi ke harga MT5
+MT5_ADJ = float(os.environ.get("MT5_ADJ", "0"))   # koreksi tambahan kalau harga broker konsisten beda dari spot
+
+def mt5_offset():
+    """Selisih harga spot emas (mendekati broker MT5) dikurangi harga OKX saat ini. None kalau sumber tidak tersedia."""
+    try: okx = float(http_json(f"https://www.okx.com/api/v5/market/ticker?instId={INST}", tries=2)["data"][0]["last"])
+    except Exception: return None
+    now_ms = pd.Timestamp.now(tz="UTC").timestamp() * 1000
+    try:
+        q = http_json("https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/USD", tries=2)
+        p = q[0]["spreadProfilePrices"][0]
+        if now_ms - q[0]["ts"] < 10 * 60 * 1000:
+            spot = (p["bid"] + p["ask"]) / 2
+            return dict(off=spot - okx + MT5_ADJ, spot=spot, okx=okx, src="Swissquote")
+    except Exception: pass
+    try:
+        g = http_json("https://api.gold-api.com/price/XAU", tries=2)
+        if (pd.Timestamp.now(tz="UTC") - pd.Timestamp(g["updatedAt"])).total_seconds() < 600:
+            return dict(off=g["price"] - okx + MT5_ADJ, spot=g["price"], okx=okx, src="gold-api")
+    except Exception: pass
+    return None
+
+def mt5_block(levels, mo):
+    """levels: list (label, harga OKX). Return teks harga versi MT5."""
+    if not mo:
+        return "<b>Di MT5:</b> harga spot tidak tersedia saat ini — pakai jaraknya dari harga MT5 kamu.\n"
+    rows = " · ".join(f"{lab} <b>{f1(v + mo['off'])}</b>" for lab, v in levels)
+    return (f"<b>Di MT5 (perkiraan):</b> {rows}\n"
+            f"<i>Selisih MT5−OKX {mo['off']:+.1f} (spot {mo['src']} {f1(mo['spot'])} vs OKX {f1(mo['okx'])}). Cek cepat dengan harga di MT5 kamu.</i>\n")
+
 def msg_setup(s):
     d = s["dir"]; arah = "LONG" if d == 1 else "SHORT"
     lvl = s["ah"] if d == 1 else s["al"]
     size = RISK_USDT / s["risk"]; ct = int(size / CT_VAL)
     mr = s.get("macro_row") or {}
     fee_r = FEE_RT * s["entry"] / s["risk"]
+    band = 0.25 * s["risk"]; lo_, hi_ = s["entry"] - band, s["entry"] + band
+    mo = mt5_offset()
     return (f"<b>[XAU] SETUP v1 — {arah}</b>\n"
             f"Candle H1 {wib(s['t'], False)}–{(pd.Timestamp(s['t']) + pd.Timedelta(hours=1)).tz_convert(WIB):%H:%M} tutup <b>{f1(s['close'])}</b>, {'di atas high' if d == 1 else 'di bawah low'} Asia {f1(lvl)}\n\n"
             f"Entry acuan: <b>{f1(s['entry'])}</b> (open H1 {wib(s['entry_t'], False)})\n"
             f"SL: <b>{f1(s['sl'])}</b> (jarak {s['risk']:.1f})\n"
             f"TP: <b>{f1(s['tp'])}</b> (jarak {s['risk']*TP_R:.1f})\n"
             f"Batas waktu: {wib(s['deadline'])}\n\n"
+            f"✅ Boleh entry kalau harga masih di <b>{f1(lo_)} – {f1(hi_)}</b>\n"
+            f"⛔ Di luar batas itu: lewati sinyal ini (radar tetap mencatat hasilnya)\n\n"
+            + mt5_block([("Entry", s["entry"]), ("SL", s["sl"]), ("TP", s["tp"])], mo)
+            + (f"Batas entry MT5: {f1(lo_ + mo['off'])} – {f1(hi_ + mo['off'])}\n\n" if mo else "\n") +
             f"H4 {tick(s['trend']==d)} · D1 {tick(s['dtrend']==d)} · Makro {sgn(s['macro'])} {tick(s['macro']*d>=0)}"
             + (f" (DXY {mr['dxy_ch5']:+.2f}%, yield riil {mr['ry_ch5']:+.2f}, data {mr['date']})\n" if mr else " (data makro tidak tersedia, dianggap netral)\n") +
             f"Ukuran per {RISK_USDT:.0f} USDT risiko: {ct*CT_VAL:.3f} XAU = {ct} kontrak OKX · fee ≈ {fee_r:.2f}R\n\n"
             + ("⚠ <b>Rilis 3★ AS selama posisi:</b>\n" + "\n".join("• " + x for x in s["events"]) + "\n\n" if s.get("events") else "") +
-            f"Level dari harga OKX. Di MetaTrader pakai jaraknya (SL {s['risk']:.1f} / TP {s['risk']*TP_R:.1f}).\n"
             f"<i>Masih forward test — catat hasilnya.</i>")
 
 def msg_result(s, sigs):
