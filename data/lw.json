@@ -116,6 +116,23 @@
    "r": 3.037,
    "r_net": 2.894,
    "final": true
+  },
+  {
+   "day": "2026-11-19",
+   "open": 3747.2,
+   "range": 129.4000000000001,
+   "up": 3811.8999999999996,
+   "dn": 3682.5,
+   "dtrend": -1,
+   "macro": -2,
+   "allowed": [
+    -1
+   ],
+   "senin": false,
+   "sent": [
+    "plan"
+   ],
+   "status": "MENUNGGU"
   }
  ]
 }
