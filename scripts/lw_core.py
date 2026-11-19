@@ -120,11 +120,17 @@ def live(d1_all, mrows, now):
             if allowed:
                 d = next(iter(allowed)); lvl = rec["up"] if d == 1 else rec["dn"]; other = rec["dn"] if d == 1 else rec["up"]
                 risk = abs(lvl - o); ct = int(R.RISK_USDT / risk / R.CT_VAL)
-                txt = (f"<b>{tag} Rencana {HARI[day.dayofweek]} {day.day} {R.BULAN[day.month-1]}</b>\n"
-                       f"Arah diizinkan: <b>{'BUY' if d == 1 else 'SELL'}</b> (D1 {'naik' if dtr == 1 else 'turun'}, makro {R.sgn(mac)})\n"
-                       f"{'BUY STOP' if d == 1 else 'SELL STOP'}: <b>{fmt(lvl)}</b> · SL {fmt(o)} (jarak {risk:.1f})\n"
-                       f"Batal kalau harga menyentuh {fmt(other)} lebih dulu. Tutup posisi besok 07:00 WIB.\n"
-                       f"Ukuran per {R.RISK_USDT:.0f} USDT risiko: {ct*R.CT_VAL:.3f} XAU = {ct} kontrak\n"
+                px = float(bars.c.iloc[-1]); gap = abs(px - lvl)
+                arah = "BUY" if d == 1 else "SELL"
+                posisi = (f"masih {gap:.1f} poin di {'bawah' if d == 1 else 'atas'} garis" if rec.get("status") == "MENUNGGU"
+                          else "garis SUDAH tersentuh, lihat pesan ENTRY")
+                txt = (f"<b>{tag} Rencana {HARI[day.dayofweek]} {day.day} {R.BULAN[day.month-1]} — JANGAN entry sekarang</b>\n"
+                       f"Pasang <b>PENDING ORDER {arah} STOP</b> di <b>{fmt(lvl)}</b>\n"
+                       f"Harga sekarang {fmt(px)} ({posisi})\n"
+                       f"SL {fmt(o)} (jarak {risk:.1f}) · batal kalau harga ke {fmt(other)} dulu · tutup besok 07:00 WIB\n"
+                       f"Posisi baru aktif saat masuk pesan <b>ENTRY</b>.\n"
+                       f"Arah {arah} karena D1 {'naik' if dtr == 1 else 'turun'}, makro {R.sgn(mac)} · ukuran per {R.RISK_USDT:.0f} USDT risiko: {ct*R.CT_VAL:.3f} XAU = {ct} kontrak\n"
+                       f"Di MT5: pasang {arah} STOP {risk:.1f} poin {'di atas' if d == 1 else 'di bawah'} harga open harian broker, SL di open tersebut.\n"
                        + ("<i>Senin = eksperimen, tidak dihitung di forward test utama.</i>" if rec["senin"] else "<i>Forward test — belum untuk uang sungguhan.</i>"))
             else:
                 why = "D1 & makro tidak searah" if dtr * mac < 0 else "arah dibatasi filter"
@@ -133,7 +139,8 @@ def live(d1_all, mrows, now):
             if R.send(txt): rec["sent"].append("plan"); changed = True
         # pesan 2: entry
         if rec.get("entry") and rec.get("dir") in allowed and "entry" not in rec["sent"] and rec.get("status") in ("AKTIF", "SL", "CLOSE"):
-            txt = (f"<b>{tag} ENTRY {'BUY' if rec['dir'] == 1 else 'SELL'}</b> di {fmt(rec['entry'])} ({R.wib(rec['entry_t'], False)})\n"
+            txt = (f"<b>{tag} ENTRY {'BUY' if rec['dir'] == 1 else 'SELL'} — posisi AKTIF</b>\n"
+                   f"Pending order tersentuh di {fmt(rec['entry'])} ({R.wib(rec['entry_t'], False)})\n"
                    f"SL {fmt(o)} · tutup besok 07:00 WIB")
             if R.send(txt): rec["sent"].append("entry"); changed = True
         # pesan batal: arah yang diblok tersentuh lebih dulu
