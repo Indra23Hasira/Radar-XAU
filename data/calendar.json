@@ -1,18 +1,6 @@
 {
  "events": [
   {
-   "t": "2026-10-29T12:30:00+00:00",
-   "title": "Advance GDP q/q",
-   "forecast": "3.2%",
-   "previous": "1.5%"
-  },
-  {
-   "t": "2026-10-29T12:30:00+00:00",
-   "title": "Core PCE Price Index m/m",
-   "forecast": "0.3%",
-   "previous": "0.2%"
-  },
-  {
    "t": "2026-11-03T15:16:00+00:00",
    "title": "Congressional Elections",
    "forecast": "",
