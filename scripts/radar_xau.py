@@ -246,6 +246,34 @@ def msg_result(s, sigs):
             f"Forward test: {len(done)} sinyal selesai · win {wins/len(done)*100:.0f}% · total {tot:+.2f}R setelah fee\n"
             f"Pembanding backtest: win 55% · rata-rata +0,26R per sinyal")
 
+def weekend_reminder(state, sigs, now):
+    """Sabtu 03:45-04:45 WIB (sebelum broker MT5 tutup 04:45 WIB): ingatkan posisi yang masih terbuka. Sekali per minggu."""
+    w = now.tz_convert(WIB)
+    if not (w.dayofweek == 5 and (3, 45) <= (w.hour, w.minute) < (4, 45)): return
+    key = w.date().isoformat()
+    if state.get("weekend_reminder") == key: return
+    try: px = float(http_json(f"https://www.okx.com/api/v5/market/ticker?instId={INST}")["data"][0]["last"])
+    except Exception: px = None
+    lines = []
+    for s in sigs:
+        if s.get("status") == "OPEN":
+            r = f" · sekarang {s['dir']*(px-s['entry'])/s['risk']:+.2f}R" if px else ""
+            lines.append(f"• [XAU] v1 {'LONG' if s['dir']==1 else 'SHORT'} entry {f1(s['entry'])}{r}")
+    try:
+        lw = json.load(open(os.path.join(ROOT, "data", "lw.json")))["days"]
+        for x in lw:
+            if x.get("status") == "AKTIF":
+                risk = abs(x["entry"] - x["open"])
+                r = f" · sekarang {x['dir']*(px-x['entry'])/risk:+.2f}R" if px else ""
+                lines.append(f"• [XAU-LW] {'BUY' if x['dir']==1 else 'SELL'} entry {f1(x['entry'])}{r}")
+    except Exception: pass
+    state["weekend_reminder"] = key
+    if not lines: return
+    send("<b>[XAU] Pengingat akhir pekan</b>\nBroker MT5 tutup sekitar <b>04:45 WIB</b> dan baru buka Senin 06:05 WIB.\n"
+         "Posisi yang masih terbuka di radar:\n" + "\n".join(lines) +
+         "\n\nTutup manual sebelum 04:45 WIB supaya tidak terbawa akhir pekan (risiko gap Senin pagi).\n"
+         "<i>Catatan forward test tetap mengikuti aturan (data OKX).</i>")
+
 # ------------------------------------------------------------------ main
 def load_state():
     try: return json.load(open(STATE))
@@ -337,6 +365,8 @@ def run(now=None):
         lw_core.live(d1, mrows, now)
     except Exception as e:
         print("LW error:", e)
+    try: weekend_reminder(state, sigs, now)
+    except Exception as e: print("pengingat akhir pekan error:", e)
     state["updated"] = now.isoformat()
     save(STATE, state)
 
