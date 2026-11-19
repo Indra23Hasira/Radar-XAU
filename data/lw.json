@@ -104,12 +104,18 @@
    "senin": false,
    "sent": [
     "plan",
-    "entry"
+    "entry",
+    "hasil"
    ],
-   "status": "AKTIF",
+   "status": "CLOSE",
    "dir": -1,
    "entry": 3828.3999999999996,
-   "entry_t": "2026-11-18 00:30:00+00:00"
+   "entry_t": "2026-11-18 00:30:00+00:00",
+   "exit": 3747.3,
+   "exit_t": "2026-11-19 00:00:00+00:00",
+   "r": 3.037,
+   "r_net": 2.894,
+   "final": true
   }
  ]
 }
