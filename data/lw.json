@@ -184,9 +184,13 @@
    ],
    "senin": true,
    "sent": [
-    "plan"
+    "plan",
+    "batal"
    ],
-   "status": "MENUNGGU"
+   "status": "DIBLOK",
+   "dir": 1,
+   "entry_t": "2026-11-23 01:00:00+00:00",
+   "final": true
   }
  ]
 }
