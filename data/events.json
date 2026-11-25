@@ -318,7 +318,8 @@
    },
    "reaction": {
     "open": 3515.5,
-    "m15": -0.899
+    "m15": -0.899,
+    "m60": -1.072
    },
    "surprise_dir": 0,
    "surprise_text": "sesuai proyeksi → reaksi biasanya kecil"
@@ -331,7 +332,8 @@
    "sent": true,
    "reaction": {
     "open": 3515.5,
-    "m15": -0.899
+    "m15": -0.899,
+    "m60": -1.072
    },
    "actual": {
     "value": 4.3,
