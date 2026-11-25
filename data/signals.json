@@ -274,7 +274,7 @@
    "sl": 3538.73,
    "tp": 3417.15,
    "deadline": "2026-11-26T12:00:00+00:00",
-   "status": "OPEN",
+   "status": "SL",
    "sent_at": "2026-11-25T12:00:50.045696+00:00",
    "macro_detail": {
     "date": "2026-11-23",
@@ -289,12 +289,16 @@
    "events": [
     "Core PCE Price Index m/m Rab 25 Nov 20:30 WIB (proyeksi 0.3%, sebelumnya 0.3%)",
     "Prelim GDP q/q Rab 25 Nov 20:30 WIB (proyeksi 3.5%, sebelumnya 3.4%)"
-   ]
+   ],
+   "exit_t": "2026-11-25T18:15:00+00:00",
+   "exit": 3538.73,
+   "r": -1.0,
+   "r_net": -1.086
   }
  ],
  "last_bar": "2026-11-25T17:00:00+00:00",
  "last_error_sent": null,
- "updated": "2026-11-25T18:00:51.208306+00:00",
+ "updated": "2026-11-25T18:15:59.855434+00:00",
  "hello_sent": true,
  "calendar_checked": "2026-11-25T16:30:50.453292+00:00",
  "weekend_reminder": "2026-11-21"
