@@ -207,6 +207,23 @@
    ],
    "status": "SKIP",
    "final": true
+  },
+  {
+   "day": "2026-11-25",
+   "open": 3557.8,
+   "range": 131.70000000000027,
+   "up": 3623.6500000000005,
+   "dn": 3491.95,
+   "dtrend": -1,
+   "macro": 0,
+   "allowed": [
+    -1
+   ],
+   "senin": false,
+   "sent": [
+    "plan"
+   ],
+   "status": "MENUNGGU"
   }
  ]
 }
