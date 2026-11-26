@@ -234,6 +234,22 @@
    "r": -1.0,
    "r_net": -1.053,
    "final": true
+  },
+  {
+   "day": "2026-11-26",
+   "open": 3582.8,
+   "range": 162.20000000000027,
+   "up": 3663.9000000000005,
+   "dn": 3501.7,
+   "dtrend": -1,
+   "macro": 1,
+   "allowed": [],
+   "senin": false,
+   "sent": [
+    "plan"
+   ],
+   "status": "SKIP",
+   "final": true
   }
  ]
 }
