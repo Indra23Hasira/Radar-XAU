@@ -250,6 +250,22 @@
    ],
    "status": "SKIP",
    "final": true
+  },
+  {
+   "day": "2026-11-27",
+   "open": 3574.4,
+   "range": 57.0,
+   "up": 3602.9,
+   "dn": 3545.9,
+   "dtrend": -1,
+   "macro": 1,
+   "allowed": [],
+   "senin": false,
+   "sent": [
+    "plan"
+   ],
+   "status": "SKIP",
+   "final": true
   }
  ]
 }
